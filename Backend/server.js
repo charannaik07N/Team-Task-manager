@@ -35,6 +35,9 @@ app.get("/health", (req, res) => {
   res.json({ status: "Server is running" });
 });
 
+// Ignore favicon requests
+app.get("/favicon.ico", (req, res) => res.status(204).end());
+
 // SPA fallback: serve index.html for all non-API GET routes
 app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
