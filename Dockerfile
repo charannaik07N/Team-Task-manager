@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -7,14 +7,14 @@ COPY . .
 
 # Install backend dependencies
 WORKDIR /app/Backend
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Install frontend dependencies and build
 WORKDIR /app/Frontend
-RUN npm ci && npm run build
+RUN npm install && npm run build
 
 # Production stage
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
