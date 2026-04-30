@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+:root {
+	--accent: 59 86% 50%; /* HSL-ish for accent (used with color utilities where possible) */
+	--muted: #6b7280;
+	--bg-soft: #f6f9ff;
+	--ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+	html, body, #root {
+		height: 100%;
+	}
+	body {
+		background: var(--bg-soft);
+		color: #0f172a;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+	}
+	h1, h2, h3, h4, h5 {
+		color: #0b1220;
+	}
+}
+
+@layer components {
+	.card-refined {
+		background-color: #ffffff;
+		border: 1px solid rgba(226, 232, 240, 0.95);
+		border-radius: 1rem;
+		padding: 1.5rem;
+		box-shadow: 0 10px 30px -24px rgba(15, 23, 42, 0.28);
+		transition: transform 200ms var(--ease-out-quart), box-shadow 200ms var(--ease-out-quart), background-color 200ms var(--ease-out-quart), border-color 200ms var(--ease-out-quart);
+	}
+
+	.btn-accent {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		border: 0;
+		border-radius: 0.875rem;
+		background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+		color: #ffffff;
+		font-weight: 600;
+		box-shadow: 0 12px 24px -18px rgba(37, 99, 235, 0.55);
+		transition: transform 200ms var(--ease-out-quart), box-shadow 200ms var(--ease-out-quart), filter 200ms var(--ease-out-quart);
+		cursor: pointer;
+	}
+}
+
+/* Small utility for subtle left accent */
+.accent-left { border-left-width: 4px; }
+
+/* Animations */
+@keyframes slideUpFade {
+	0% { opacity: 0; transform: translateY(8px); }
+	100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  0% { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-item {
+	animation-name: slideUpFade;
+	animation-duration: 420ms;
+	animation-fill-mode: both;
+	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-slideDown {
+	animation-name: slideDown;
+	animation-duration: 300ms;
+	animation-fill-mode: both;
+	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-stagger > * {
+	opacity: 0;
+}
+
+/* Button press micro-interaction */
+.btn-pressable:active { transform: scale(0.97); }
+
+.card-refined:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 18px 40px -26px rgba(15, 23, 42, 0.36);
+	border-color: rgba(191, 219, 254, 0.85);
+	background-color: rgba(255, 255, 255, 0.98);
+}
+
+.btn-accent:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 18px 32px -18px rgba(37, 99, 235, 0.5);
+	filter: saturate(1.02);
+}
+
+.btn-accent:active,
+.btn-pressable:active {
+	transform: scale(0.97);
+}
+
+/* Input focus */
+input:focus, textarea:focus, select:focus {
+	outline: none;
+	box-shadow: 0 6px 20px rgba(59,130,246,0.12);
+	border-color: rgba(59,130,246,0.6);
+	transition: box-shadow 180ms var(--ease-out-quart), border-color 180ms var(--ease-out-quart);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+	.animate-item, .animate-stagger, .btn-accent, .btn-pressable {
+		animation-duration: 1ms !important;
+		transition-duration: 1ms !important;
+	}
+}
