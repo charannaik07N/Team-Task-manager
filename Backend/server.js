@@ -1,67 +1,66 @@
-  const express = require("express");
-  const cors = require("cors");
-  require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+require("dotenv").config();
 
-  const connectDB = require("./Db");
-  const authRoutes = require("./routes/auth");
-  const projectRoutes = require("./routes/projects");
-  const taskRoutes = require("./routes/tasks");
-  const dashboardRoutes = require("./routes/dashboard");
-  const { errorHandler } = require("./middleware/errorHandler");
+const connectDB = require("./Db");
+const authRoutes = require("./routes/auth");
+const projectRoutes = require("./routes/projects");
+const taskRoutes = require("./routes/tasks");
+const dashboardRoutes = require("./routes/dashboard");
+const { errorHandler } = require("./middleware/errorHandler");
 
-  const app = express();
-  const path = require("path");
+const app = express();
 
-  // Middleware
-  app.use(express.json());
-  app.use(
-    cors({
+// Middleware
+app.use(express.json());
+app.use(
+  cors({
     origin: [
-      "http://localhost:5173", 
+      "http://localhost:5173",
       "http://localhost:5174",
-      "https://team-task-manager-production-646c.up.railway.app"
+      "https://team-task-manager-production-646c.up.railway.app",
     ],
-  // Serve static files from Frontend build
-  app.use(express.static(path.join(__dirname, "public"))),
+    credentials: true,
+  }), // ← closed properly
+);
 
-  // Routes
-  app.use("/api/auth", authRoutes),
-  app.use("/api/projects", projectRoutes),
-  app.use("/api/tasks", taskRoutes),
-  app.use("/api/dashboard", dashboardRoutes);
+// Serve static files from Frontend build
+app.use(express.static(path.join(__dirname, "public")));
 
-  // Health check routes
-  app.get("/health", (req, res) => {
-    res.json({ status: "Server is running" });
-  });
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
-  app.get("/", (req, res) => {
-    res.send("API is running");
-  });
+// Health check
+app.get("/health", (req, res) => {
+  res.json({ status: "Server is running" });
+});
 
-  // Ignore favicon requests
-  app.get("/favicon.ico", (req, res) => res.status(204).end());
+app.get("/", (req, res) => {
+  res.send("API is running");
+});
 
-  // SPA fallback: serve index.html for all non-API GET routes
-  app.get(/^(?!\/api).*/, (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
-  });
+// Ignore favicon requests
+app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-  // Error handling middleware
-  app.use(errorHandler);
+// SPA fallback
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
-  const PORT = process.env.PORT || 5000;
+// Error handling
+app.use(errorHandler);
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+const PORT = process.env.PORT || 5000;
 
-  // Connect DB separately
-  connectDB()
-    .then(() => {
-      console.log("MongoDB Connected");
-    })
-    .catch((err) => {
-      console.error("MongoDB Error:", err.message);
-    });
-  // update
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+// Connect DB
+connectDB()
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB Error:", err.message));
