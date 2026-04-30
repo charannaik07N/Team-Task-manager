@@ -10,6 +10,7 @@ const dashboardRoutes = require("./routes/dashboard");
 const { errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
+const path = require("path");
 
 // Middleware
 app.use(express.json());
@@ -20,6 +21,9 @@ app.use(
   }),
 );
 
+// Serve static files from Frontend build
+app.use(express.static(path.join(__dirname, "public")));
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
@@ -29,6 +33,11 @@ app.use("/api/dashboard", dashboardRoutes);
 // Health check
 app.get("/health", (req, res) => {
   res.json({ status: "Server is running" });
+});
+
+// SPA fallback: serve index.html for all non-API routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Error handling middleware
