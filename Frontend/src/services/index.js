@@ -7,18 +7,18 @@ export const authService = {
   login: (email, password) => api.post("/auth/login", { email, password }),
 
   getMe: () => api.get("/auth/me"),
+
+  getAllUsers: () => api.get("/auth/users"),
 };
 
 export const projectService = {
-  createProject: (name, description) =>
-    api.post("/projects", { name, description }),
+  createProject: (projectData) => api.post("/projects", projectData),
 
   getProjects: () => api.get("/projects"),
 
   getProject: (id) => api.get(`/projects/${id}`),
 
-  updateProject: (id, name, description) =>
-    api.put(`/projects/${id}`, { name, description }),
+  updateProject: (id, projectData) => api.put(`/projects/${id}`, projectData),
 
   deleteProject: (id) => api.delete(`/projects/${id}`),
 

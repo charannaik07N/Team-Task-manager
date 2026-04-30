@@ -33,13 +33,27 @@ export function ProjectCard({ project, onDelete }) {
           {membersCount} member{membersCount === 1 ? "" : "s"}
         </span>
         <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-          Active workspace
+          {project.status || "Pending"}
         </span>
+        {project.dueDate && (
+          <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+            Due: {new Date(project.dueDate).toLocaleDateString()}
+          </span>
+        )}
       </div>
 
       <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-slate-600">
         {project.description || "No description provided."}
       </p>
+
+      {project.assignedTo && (
+        <div className="mt-3 text-xs font-medium text-slate-600">
+          <span className="text-slate-400 font-semibold mr-1">
+            Assigned to:
+          </span>
+          {project.assignedTo.name || "A user"}
+        </div>
+      )}
 
       <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
         <div className="text-xs text-slate-500">

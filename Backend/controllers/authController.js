@@ -84,3 +84,12 @@ exports.getMe = asyncHandler(async (req, res, next) => {
     user,
   });
 });
+
+// Get All Users (for assigning projects/tasks)
+exports.getAllUsers = asyncHandler(async (req, res, next) => {
+  const users = await User.find({}).select("name email _id");
+  res.status(200).json({
+    success: true,
+    users,
+  });
+});

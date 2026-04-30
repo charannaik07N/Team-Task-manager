@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FolderPlus, Plus, Sparkles } from "lucide-react";
-import { projectService } from "../services";
+import { projectService, authService } from "../services";
 import { ProjectCard } from "../components/ProjectCard";
 
 export function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ name: "", description: "" });
+  const [users, setUsers] = useState([]);
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    status: "Pending",
+    dueDate: "",
+    assignedTo: "",
+  });
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchProjects();
+    fetchUsers();
   }, []);
 
   const fetchProjects = async () => {
@@ -27,6 +35,17 @@ export function ProjectsPage() {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const response = await authService.getAllUsers();
+      if (response.data?.users) {
+        setUsers(response.data.users);
+      }
+    } catch (err) {
+      console.error("Failed to fetch users");
+    }
+  };
+
   const handleCreateProject = async (e) => {
     e.preventDefault();
     if (!formData.name) {
@@ -35,8 +54,14 @@ export function ProjectsPage() {
     }
 
     try {
-      await projectService.createProject(formData.name, formData.description);
-      setFormData({ name: "", description: "" });
+      await projectService.createProject(formData);
+      setFormData({
+        name: "",
+        description: "",
+        status: "Pending",
+        dueDate: "",
+        assignedTo: "",
+      });
       setShowForm(false);
       setError("");
       fetchProjects();
@@ -173,6 +198,60 @@ export function ProjectsPage() {
                   placeholder="Enter project description"
                   rows="3"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Status
+                  </label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) =>
+                      setFormData({ ...formData, status: e.target.value })
+                    }
+                    className="mt-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-slate-900 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Due">Due</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Due Date
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.dueDate}
+                    onChange={(e) =>
+                      setFormData({ ...formData, dueDate: e.target.value })
+                    }
+                    className="mt-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-slate-900 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700">
+                  Assign To
+                </label>
+                <select
+                  value={formData.assignedTo}
+                  onChange={(e) =>
+                    setFormData({ ...formData, assignedTo: e.target.value })
+                  }
+                  className="mt-2 w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-slate-900 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                >
+                  <option value="">Select a user (optional)</option>
+                  {users.map((user) => (
+                    <option key={user._id} value={user._id}>
+                      {user.name} ({user.email})
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="flex flex-wrap gap-3 pt-1">

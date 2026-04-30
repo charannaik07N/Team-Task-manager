@@ -10,6 +10,18 @@ const projectSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  status: {
+    type: String,
+    enum: ["Pending", "In Progress", "Completed", "Due"],
+    default: "Pending",
+  },
+  dueDate: {
+    type: Date,
+  },
+  assignedTo: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
   createdBy: {
     type: mongoose.Schema.ObjectId,
     ref: "User",

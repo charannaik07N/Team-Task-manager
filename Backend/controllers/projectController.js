@@ -4,18 +4,31 @@ const asyncHandler = require("../utils/asyncHandler");
 
 // Create Project
 exports.createProject = asyncHandler(async (req, res, next) => {
-  const { name, description } = req.body;
+  const { name, description, status, dueDate, assignedTo } = req.body;
 
   if (!name) {
     return next(new AppError("Please provide a project name", 400));
   }
 
-  const project = await Project.create({
+  const projectData = {
     name,
     description,
+    status: status || "Pending",
     createdBy: req.userId,
     members: [{ userId: req.userId, role: "Admin" }],
-  });
+  };
+
+  if (dueDate) projectData.dueDate = dueDate;
+
+  if (assignedTo) {
+    projectData.assignedTo = assignedTo;
+    // Add assigned user as a member if not the creator
+    if (assignedTo !== req.userId) {
+      projectData.members.push({ userId: assignedTo, role: "Member" });
+    }
+  }
+
+  const project = await Project.create(projectData);
 
   res.status(201).json({
     success: true,
@@ -29,6 +42,7 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
     $or: [{ createdBy: req.userId }, { "members.userId": req.userId }],
   })
     .populate("createdBy", "name email")
+    .populate("assignedTo", "name email")
     .populate("members.userId", "name email");
 
   res.status(200).json({
@@ -41,6 +55,7 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
 exports.getProject = asyncHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id)
     .populate("createdBy", "name email")
+    .populate("assignedTo", "name email")
     .populate("members.userId", "name email");
 
   if (!project) {
@@ -55,18 +70,23 @@ exports.getProject = asyncHandler(async (req, res, next) => {
 
 // Update Project
 exports.updateProject = asyncHandler(async (req, res, next) => {
-  const { name, description } = req.body;
+  const { name, description, status, dueDate, assignedTo } = req.body;
 
   if (req.userRole !== "Admin") {
     return next(new AppError("Only admins can update the project", 403));
   }
 
-  const project = await Project.findByIdAndUpdate(
-    req.params.id,
-    { name, description },
-    { new: true, runValidators: true },
-  )
+  const updateData = { name, description };
+  if (status) updateData.status = status;
+  if (dueDate !== undefined) updateData.dueDate = dueDate;
+  if (assignedTo !== undefined) updateData.assignedTo = assignedTo;
+
+  const project = await Project.findByIdAndUpdate(req.params.id, updateData, {
+    new: true,
+    runValidators: true,
+  })
     .populate("createdBy", "name email")
+    .populate("assignedTo", "name email")
     .populate("members.userId", "name email");
 
   if (!project) {
