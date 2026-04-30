@@ -1,9 +1,21 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Users, Trash2 } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 
 export function ProjectCard({ project, onDelete }) {
+  const { user } = useAuth();
   const membersCount = project.members?.length || 0;
+
+  // Determine if the current user is an admin for this project
+  const isCreator =
+    project.createdBy?._id === user?.id || project.createdBy === user?.id;
+
+  const currentMember = project.members?.find(
+    (m) => m.userId?._id === user?.id || m.userId === user?.id,
+  );
+
+  const isAdmin = currentMember ? currentMember.role === "Admin" : isCreator;
 
   return (
     <div className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_10px_30px_-20px_rgba(15,23,42,0.35)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_18px_42px_-26px_rgba(15,23,42,0.35)]">
@@ -18,13 +30,15 @@ export function ProjectCard({ project, onDelete }) {
             {project.name}
           </h3>
         </div>
-        <button
-          onClick={() => onDelete(project._id)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 active:scale-95"
-          aria-label={`Delete ${project.name}`}
-        >
-          <Trash2 size={16} />
-        </button>
+        {isAdmin && (
+          <button
+            onClick={() => onDelete(project._id)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 active:scale-95"
+            aria-label={`Delete ${project.name}`}
+          >
+            <Trash2 size={16} />
+          </button>
+        )}
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">

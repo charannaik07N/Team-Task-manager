@@ -142,28 +142,21 @@ export function DashboardPage() {
               </p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-sm text-slate-500">Overdue tasks</p>
+              <p className="text-sm text-slate-500">Active Projects</p>
               <p className="mt-2 text-3xl font-semibold text-slate-900">
-                {stats?.overdueTasks || 0}
+                {stats?.inProgressProjects || 0}
               </p>
               <p className="mt-1 text-sm text-slate-600">
-                These need a quick follow-up.
+                Projects currently in progress.
               </p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-sm text-slate-500">Completion rate</p>
+              <p className="text-sm text-slate-500">Pending Projects</p>
               <p className="mt-2 text-3xl font-semibold text-slate-900">
-                {stats?.totalTasks || 0
-                  ? Math.round(
-                      ((stats?.completedTasks || 0) /
-                        (stats?.totalTasks || 1)) *
-                        100,
-                    )
-                  : 0}
-                %
+                {stats?.pendingProjects || 0}
               </p>
               <p className="mt-1 text-sm text-slate-600">
-                Based on your current workload.
+                Projects waiting to be started.
               </p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">

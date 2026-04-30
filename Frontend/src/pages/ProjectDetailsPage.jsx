@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Plus, Users } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Plus, Users, Edit2, Trash2 } from "lucide-react";
 import { projectService, taskService } from "../services";
 import { TaskCard } from "../components/TaskCard";
 import { TaskModal } from "../components/TaskModal";
+import { useAuth } from "../hooks/useAuth";
 
 export function ProjectDetailsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showMemberForm, setShowMemberForm] = useState(false);
+  const [showEditProjectForm, setShowEditProjectForm] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    description: "",
+  });
   const [selectedTask, setSelectedTask] = useState(null);
   const [memberData, setMemberData] = useState({ userId: "", role: "Member" });
 
@@ -105,6 +113,28 @@ export function ProjectDetailsPage() {
     }
   };
 
+  const handleUpdateProject = async (e) => {
+    e.preventDefault();
+    try {
+      await projectService.updateProject(id, editFormData);
+      setShowEditProjectForm(false);
+      fetchProjectDetails();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update project");
+    }
+  };
+
+  const handleDeleteProject = async () => {
+    if (window.confirm("Are you sure you want to delete this project?")) {
+      try {
+        await projectService.deleteProject(id);
+        navigate("/projects");
+      } catch (err) {
+        setError("Failed to delete project");
+      }
+    }
+  };
+
   if (loading)
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -124,6 +154,13 @@ export function ProjectDetailsPage() {
     done: tasks.filter((t) => t.status === "Done"),
   };
 
+  const isCreator =
+    project.createdBy?._id === user?.id || project.createdBy === user?.id;
+  const currentMember = project.members?.find(
+    (m) => m.userId?._id === user?.id || m.userId === user?.id,
+  );
+  const isAdmin = currentMember ? currentMember.role === "Admin" : isCreator;
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-7xl mx-auto">
@@ -135,14 +172,86 @@ export function ProjectDetailsPage() {
               </h1>
               <p className="text-gray-600 mt-2">{project.description}</p>
             </div>
-            <button
-              onClick={() => setShowTaskModal(true)}
-              className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              <Plus size={20} />
-              New Task
-            </button>
+            <div className="flex gap-2">
+              {isAdmin && (
+                <>
+                  <button
+                    onClick={() => {
+                      setEditFormData({
+                        name: project.name,
+                        description: project.description,
+                      });
+                      setShowEditProjectForm(true);
+                    }}
+                    className="flex items-center gap-2 bg-slate-100 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-200 transition"
+                  >
+                    <Edit2 size={18} />
+                    Edit
+                  </button>
+                  <button
+                    onClick={handleDeleteProject}
+                    className="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 transition"
+                  >
+                    <Trash2 size={18} />
+                    Delete
+                  </button>
+                </>
+              )}
+              <button
+                onClick={() => setShowTaskModal(true)}
+                className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+              >
+                <Plus size={20} />
+                New Task
+              </button>
+            </div>
           </div>
+
+          {showEditProjectForm && (
+            <form
+              onSubmit={handleUpdateProject}
+              className="mb-6 p-4 bg-gray-50 rounded border border-gray-200"
+            >
+              <h3 className="font-bold mb-3 text-gray-800">Edit Project</h3>
+              <input
+                type="text"
+                value={editFormData.name}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, name: e.target.value })
+                }
+                className="w-full mb-3 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                placeholder="Project Name"
+                required
+              />
+              <textarea
+                value={editFormData.description}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    description: e.target.value,
+                  })
+                }
+                className="w-full mb-3 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                placeholder="Project Description"
+                rows="3"
+              ></textarea>
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowEditProjectForm(false)}
+                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
