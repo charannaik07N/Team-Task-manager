@@ -37,7 +37,7 @@ This file documents the deployment setup for Team-Task-Manager on Railway/Railpa
 
 - Added `path` module import for file serving
 - Added static file serving middleware to serve the Frontend build
-- Added SPA fallback route (`*`) to serve `index.html` for React Router
+- Added an Express 5-safe SPA fallback route to serve `index.html` for React Router
 
 ## Deployment Options
 

@@ -36,11 +36,7 @@ app.get("/health", (req, res) => {
 });
 
 // SPA fallback: serve index.html for all non-API GET routes
-app.use((req, res, next) => {
-  if (req.method !== "GET" || req.path.startsWith("/api")) {
-    return next();
-  }
-
+app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
