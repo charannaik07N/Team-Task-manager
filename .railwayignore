@@ -11,3 +11,4 @@ Frontend/dist
 Frontend/node_modules
 Backend/node_modules
 Backend/public
+Backend/.env
