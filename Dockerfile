@@ -1,23 +1,31 @@
-FROM node:18-alpine
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy entire project
+# Copy project files
 COPY . .
 
 # Install backend dependencies
 WORKDIR /app/Backend
-RUN npm ci --only=production || npm install
+RUN npm ci --only=production
 
 # Install frontend dependencies and build
 WORKDIR /app/Frontend
-RUN npm ci --only=production || npm install && npm run build
+RUN npm ci && npm run build
+
+# Production stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy only necessary files from builder
+COPY --from=builder /app/Backend ./Backend
+COPY --from=builder /app/Frontend/dist ./Frontend/dist
 
 # Setup backend public folder with frontend build
-WORKDIR /app
-RUN mkdir -p Backend/public && cp -r Frontend/dist/* Backend/public/ || true
+RUN mkdir -p Backend/public && cp -r Frontend/dist/* Backend/public/
 
-# Expose port (Railway will detect this)
+# Expose port
 EXPOSE 5000
 
 # Start backend server
