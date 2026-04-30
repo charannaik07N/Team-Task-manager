@@ -1,10 +1,9 @@
 import axios from "axios";
 
-// Use environment variable for production, or fallback to localhost for development
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+// In production, frontend is served from same origin as backend
+// So relative /api works perfectly. Only use localhost in dev.
+const API_BASE_URL = import.meta.env.DEV ? "http://localhost:5000/api" : "/api";
 
-// Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
