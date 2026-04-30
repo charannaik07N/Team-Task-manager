@@ -5,16 +5,27 @@ set -e
 
 echo "🚀 Starting deployment process..."
 
+# Ensure npm is available
+if ! command -v npm &> /dev/null; then
+    echo "⚠️  npm not found in PATH, trying to find Node.js..."
+    export PATH="/usr/local/bin:$PATH:/opt/render/project/.nvm/versions/node/v*/bin"
+fi
+
+# Verify Node and npm are available
+echo "Checking Node.js installation..."
+node --version
+npm --version
+
 # Install backend dependencies
 echo "📦 Installing backend dependencies..."
 cd Backend
-npm install
+npm ci --only=production || npm install
 cd ..
 
 # Install frontend dependencies and build
 echo "📦 Installing frontend dependencies..."
 cd Frontend
-npm install
+npm ci --only=production || npm install
 
 echo "🔨 Building frontend..."
 npm run build

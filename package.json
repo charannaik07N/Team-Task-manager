@@ -1,0 +1,18 @@
+{
+  "name": "team-task-manager",
+  "version": "1.0.0",
+  "description": "Team Task Manager - MERN Stack Application",
+  "main": "Backend/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "bash start.sh",
+    "build": "bash start.sh",
+    "dev": "echo 'Run npm run dev in Backend and Frontend separately'",
+    "postinstall": "echo 'Dependencies installed'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
