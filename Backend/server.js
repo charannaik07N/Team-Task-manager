@@ -30,9 +30,13 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
-// Health check
+// Health check routes
 app.get("/health", (req, res) => {
   res.json({ status: "Server is running" });
+});
+
+app.get("/", (req, res) => {
+  res.send("API is running");
 });
 
 // Ignore favicon requests
@@ -48,14 +52,15 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB and start server
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+// Connect DB separately
 connectDB()
   .then(() => {
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+    console.log("MongoDB Connected");
   })
   .catch((err) => {
-    console.error("Failed to start server:", err.message);
-    process.exit(1);
+    console.error("MongoDB Error:", err.message);
   });
