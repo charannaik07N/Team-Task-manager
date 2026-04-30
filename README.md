@@ -2,6 +2,10 @@
 
 A complete production-ready project management web application built with MongoDB, Express.js, React.js, and Node.js (MERN stack).
 
+## 🌐 Live Demo
+
+👉 **[https://team-task-manager-production-646c.up.railway.app/](https://team-task-manager-production-646c.up.railway.app/)**
+
 ## ✨ Features
 
 - **User Authentication**: Secure JWT-based authentication with password hashing
