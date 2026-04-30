@@ -35,8 +35,12 @@ app.get("/health", (req, res) => {
   res.json({ status: "Server is running" });
 });
 
-// SPA fallback: serve index.html for all non-API routes
-app.get("*", (req, res) => {
+// SPA fallback: serve index.html for all non-API GET routes
+app.use((req, res, next) => {
+  if (req.method !== "GET" || req.path.startsWith("/api")) {
+    return next();
+  }
+
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
